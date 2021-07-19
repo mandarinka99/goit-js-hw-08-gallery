@@ -63,3 +63,92 @@ const galleryItems = [
     description: 'Lighthouse Coast Sea',
   },
 ];
+
+const gallery = document.querySelector('.js-gallery');
+
+galleryItems.forEach(({ preview, original, description }) => {
+  gallery.insertAdjacentHTML('beforeend', `<li class="gallery__item">
+  <a
+    class="gallery__link"
+    href="${original}"
+  >
+    <img
+      class="gallery__image"
+      src="${preview}"
+      data-source="${original}"
+      alt="${description}"
+    />
+  </a>
+</li>`);
+});
+
+const lightBox = document.querySelector('.js-lightbox');
+const lightBoxImg = lightBox.querySelector('.lightbox__image');
+
+
+gallery.addEventListener('click', event => {
+  event.preventDefault();
+  if (event.target.nodeName !== "IMG")
+  return;
+  setLiteBoxImgAttributes(
+    event.target.dataset.source,
+    event.target.getAttribute('alt')
+  );
+  lightBox.classList.add('is-open');
+
+});
+
+const setLiteBoxImgAttributes = (src, alt) => {
+  lightBoxImg.setAttribute('src', src);
+  lightBoxImg.setAttribute('alt', alt);
+};
+
+const closeLightBox = () => {
+  lightBox.classList.remove('is-open');
+  setLiteBoxImgAttributes('', '');
+};
+
+const closeButton = document.querySelector('button[data-action="close-lightbox"]');
+closeButton.addEventListener('click', closeLightBox);
+
+const closeOverlay = document.querySelector('.lightbox__overlay');
+closeOverlay.addEventListener('click', closeLightBox);
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightBox();
+});
+
+window.addEventListener('keydown', e => {
+  const currentSrc = lightBoxImg.getAttribute('src');
+  const curSrcIndex = galleryItems.findIndex(item => item.original === currentSrc);
+
+  if (e.key === 'ArrowRight') {
+    let nextSrcIndex = curSrcIndex + 1;
+    if (nextSrcIndex >= galleryItems.length) {
+      nextSrcIndex = 0;
+    }
+    setLiteBoxImgAttributes(
+      galleryItems[nextSrcIndex].original, 
+      galleryItems[nextSrcIndex].description
+    );
+  }
+
+  if (e.key === 'ArrowLeft') {
+    let prevSrcIndex = curSrcIndex - 1;
+    if (prevSrcIndex < 0) {
+      prevSrcIndex = galleryItems.length - 1;
+    }
+    setLiteBoxImgAttributes(
+      galleryItems[prevSrcIndex].original, 
+      galleryItems[prevSrcIndex].description
+    );
+  }
+});
+
+
+
+
+
+
+
+
